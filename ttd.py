@@ -1,4 +1,5 @@
 import json
+
 import requests
 
 class TradeDesk:
@@ -31,7 +32,7 @@ class TradeDesk:
             "AdvertiserIds": [advertiser_id],
             "PageStartIndex": 0,
             "PageSize": 1,
-            "ReportScheduleIds": [report_schedule_id],
+            "ReportScheduleIds": [int(report_schedule_id)],
             "SortFields": [
                 {
                     "FieldId": "ReportEndDateExclusive",
