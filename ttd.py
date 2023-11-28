@@ -14,12 +14,13 @@ class TradeDesk:
 
     def _authenticate(self):
         auth_endpoint = "/authentication"
-        payload = json.dumps({
+        payload = {
             "Login": self.username,
             "Password": self.password
-        })
-        response = self.session.post(self.api_base_url+auth_endpoint, data=payload)
+        }
+        response = self.session.post(self.api_base_url+auth_endpoint, json=payload)
         response = response.json()
+        print(response)
         token = response["Token"]
         self.session.headers.update(
             {
@@ -29,7 +30,7 @@ class TradeDesk:
 
     def get_report_url(self, report_schedule_id: str, advertiser_id: str):
         report_url = "/myreports/reportexecution/query/advertisers"
-        payload = json.dumps({
+        payload = {
             "AdvertiserIds": [advertiser_id],
             "PageStartIndex": 0,
             "PageSize": 1,
@@ -43,8 +44,8 @@ class TradeDesk:
             "ReportExecutionStates": [
                 "Complete"
             ]
-        })
-        response = self.session.post(self.api_base_url+report_url, data=payload)
+        }
+        response = self.session.post(self.api_base_url+report_url, json=payload)
         response = response.json()
         self.download_url = response["Result"][0]["ReportDeliveries"][0]["DownloadURL"]
 

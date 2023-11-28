@@ -21,8 +21,8 @@ class Component(ComponentBase):
         table = self.create_out_table_definition("output.csv", incremental=False)
         out_table_path = table.full_path
 
-        with open(table.full_path, mode="wb", encoding="utf-8", newline="") as out_file:
-            out_file.write(data.content)
+        with open(table.full_path, mode="wt", encoding="utf-8", newline="") as out_file:
+            out_file.write(data.text)
 
         self.write_manifest(table)
 
