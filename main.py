@@ -2,7 +2,6 @@ import logging
 
 from keboola.component.base import ComponentBase 
 from keboola.component import UserException
-from requests import Response
 
 from ttd import TradeDesk
 
@@ -13,7 +12,7 @@ class Component(ComponentBase):
         super().__init__()
     
     def run(self):
-        params = self.configuration_parameters
+        params = self.configuration.parameters
         logging.info(params)
         ttd_client = TradeDesk(username=params.get(USERNAME), password=params.get(PASSWORD))
         ttd_client.get_report_url(report_schedule_id=params.get(REPORT_SCHEDULE_ID), advertiser_id=params.get(ADVERTISER_ID))
