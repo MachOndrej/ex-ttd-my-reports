@@ -14,8 +14,8 @@ class Component(ComponentBase):
     def run(self):
         params = self.configuration.parameters
         logging.info(params)
-        ttd_client = TradeDesk(username=params.get(USERNAME), password=params.get(PASSWORD))
-        ttd_client.get_report_url(report_schedule_id=params.get(REPORT_SCHEDULE_ID), advertiser_id=params.get(ADVERTISER_ID))
+        ttd_client = TradeDesk(username=params.get("USERNAME"), password=params.get("PASSWORD"))
+        ttd_client.get_report_url(report_schedule_id=params.get("REPORT_SCHEDULE_ID"), advertiser_id=params.get("ADVERTISER_ID"))
         data = ttd_client.get_data()
 
         table = self.create_out_table_definition("output.csv", incremental=False)
