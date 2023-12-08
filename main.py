@@ -1,6 +1,8 @@
 import logging
+from typing import List
 
-from keboola.component.base import ComponentBase
+from keboola.component.base import ComponentBase, sync_action
+from keboola.component.sync_actions import SelectElement
 from keboola.component import UserException
 
 from ttd import TradeDesk
@@ -29,6 +31,17 @@ class Component(ComponentBase):
             out_file.write(data.text)
 
         self.write_manifest(table)
+
+    @sync_action("get_advertisers")
+    def get_advertisers(self) -> List[SelectElement]:
+        params = self.configuration.parameters
+        ttd_client = TradeDesk(username=params.get("username"), password=params.get("#password"))
+        partners = ttd_client.get_partners()
+        advertisers = ttd_client.get_advertisers(partners)
+        select_elements = [SelectElement(value=adv["advertiser_id"], label=adv["advertiser_name"]) for adv in
+                           advertisers]
+
+        return select_elements
 
 
 if __name__ == "__main__":
