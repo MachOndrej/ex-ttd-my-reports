@@ -35,7 +35,7 @@ class Component(ComponentBase):
         self._logger.debug(f"Running component with following params: {params}")
 
         ttd_client = TradeDesk(username=params.get(PARAM_USERNAME), password=params.get(PARAM_PASSWORD))
-        advertiser_ids = params.get(PARAM_ADVERTISER_ID)
+        advertiser_ids = self._get_advertisers()
 
         destination = params.get(PARAM_DESTINATION)
         table_name = destination.get(PARAM_DESTINATION_TABLE)
@@ -60,12 +60,12 @@ class Component(ComponentBase):
 
     def _get_advertisers(self) -> List[dict[str, str]]:
         params = self.configuration.parameters
-        if isinstance(params.get("advertiser_id", ""), str):
+        if isinstance(params.get(PARAM_ADVERTISER_ID, ""), str):
             advertiser_ids = comma_separated_values_to_list(params.get("advertiser_id", ""))
         else:
-            advertiser_ids = params.get("advertiser_id", [])
+            advertiser_ids = params.get(PARAM_ADVERTISER_ID, [])
         if not advertiser_ids:
-            ttd_client = TradeDesk(username=params.get("username"), password=params.get("#password"))
+            ttd_client = TradeDesk(username=params.get(PARAM_USERNAME), password=params.get(PARAM_PASSWORD))
             partners = ttd_client.get_partners()
             advertiser_ids = ttd_client.get_advertisers(partners)
 
