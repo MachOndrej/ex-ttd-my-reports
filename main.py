@@ -52,7 +52,7 @@ class Component(ComponentBase):
             advertiser_ids = []
         return advertiser_ids
 
-    @sync_action("load_advertisers")
+    @sync_action("loadAdvertisers")
     def load_advertisers(self) -> List[SelectElement]:
         advertiser_ids = self._get_advertisers()
         select_elements = [SelectElement(value=adv["advertiser_id"], label=adv["advertiser_name"]) for adv in

@@ -20,7 +20,7 @@
       "options": {
         "async": {
           "label": "Load Advertiser IDs",
-          "action": "load_advertisers"
+          "action": "loadAdvertisers"
         }
       },
       "uniqueItems": true,
