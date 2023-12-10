@@ -16,7 +16,15 @@
       "items": {
         "enum": [],
         "type": "string"
-      }
+      },
+      "options": {
+        "async": {
+          "label": "Load Advertiser IDs",
+          "action": "load_advertisers"
+        }
+      },
+      "uniqueItems": true,
+      "description": "Advertisers for which report data will be downloaded, leave empty to download data for all Advertisers."
     },
     "report_settings": {
       "title": "Report Settings",
