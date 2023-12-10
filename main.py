@@ -19,7 +19,7 @@ PARAM_DESTINATION_PRIMARY_KEYS = "primary_keys"
 PARAM_DESTINATION_INCREMENTAL = "incremental_output"
 
 PARAM_REPORT_SETTINGS = "report_settings"
-PARAM_REPORT_SETTINGS_SCHEDULE_ID = "schedule_id"
+PARAM_REPORT_SETTINGS_SCHEDULE_ID = "report_schedule_id"
 
 
 class Component(ComponentBase):

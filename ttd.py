@@ -42,13 +42,13 @@ class TradeDesk:
         )
         self._logger.info("Authentication successful.")
 
-    def get_report_url(self, report_schedule_id: str, advertiser_ids: list[str]) -> str:
+    def get_report_url(self, report_schedule_id: int, advertiser_ids: list[str]) -> str:
         report_url = "/myreports/reportexecution/query/advertisers"
         payload = {
             "AdvertiserIds": advertiser_ids,
             "PageStartIndex": 0,
             "PageSize": 1,
-            "ReportScheduleIds": [int(report_schedule_id)],
+            "ReportScheduleIds": [report_schedule_id],
             "SortFields": [
                 {
                     "FieldId": "ReportEndDateExclusive",
