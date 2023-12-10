@@ -1,8 +1,6 @@
 name: 'GitHub Actions'
 'on':
-    push:
-        branches:
-            - main
+    - push
 concurrency: 'ci-${{ github.ref }}'
 env:
     APP_IMAGE: keboola-component
