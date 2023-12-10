@@ -8,6 +8,19 @@ from keboola.utils.helpers import comma_separated_values_to_list
 
 from ttd import TradeDesk
 
+PARAM_USERNAME = "username"
+PARAM_PASSWORD = "#password"
+
+PARAM_ADVERTISER_ID = "advertiser_id"
+
+PARAM_DESTINATION = "destination"
+PARAM_DESTINATION_TABLE = "output_table_name"
+PARAM_DESTINATION_PRIMARY_KEYS = "primary_keys"
+PARAM_DESTINATION_INCREMENTAL = "incremental_output"
+
+PARAM_REPORT_SETTINGS = "report_settings"
+PARAM_REPORT_SETTINGS_SCHEDULE_ID = "schedule_id"
+
 
 class Component(ComponentBase):
 
@@ -16,20 +29,29 @@ class Component(ComponentBase):
         self._logger = logging.getLogger(__name__)
 
     def run(self):
+        self.validate_configuration_parameters()
+
         params = self.configuration.parameters
         self._logger.debug(f"Running component with following params: {params}")
-        ttd_client = TradeDesk(username=params.get("username"), password=params.get("#password"))
-        advertisers = params.get("advertiser_ids")
-        table_name = params.get("output_table_name")
-        is_incremental = bool(params.get("incremental_output"))
-        advertiser_ids = advertisers.split(",")
-        report_url = ttd_client.get_report_url(report_schedule_id=params.get("report_schedule_id"),
+
+        ttd_client = TradeDesk(username=params.get(PARAM_USERNAME), password=params.get(PARAM_PASSWORD))
+        advertiser_ids = params.get(PARAM_ADVERTISER_ID)
+
+        destination = params.get(PARAM_DESTINATION)
+        table_name = destination.get(PARAM_DESTINATION_TABLE)
+        is_incremental = bool(destination.get(PARAM_DESTINATION_INCREMENTAL))
+        primary_keys = destination.get(PARAM_DESTINATION_PRIMARY_KEYS)
+
+        report_settings = params.get(PARAM_REPORT_SETTINGS)
+        report_schedule_id = report_settings.get(PARAM_REPORT_SETTINGS_SCHEDULE_ID)
+
+        report_url = ttd_client.get_report_url(report_schedule_id=report_schedule_id,
                                                advertiser_ids=advertiser_ids)
         data = ttd_client.get_data(report_url)
         self._logger.info("Processing report.")
 
         table = self.create_out_table_definition(f"{table_name}.csv", incremental=is_incremental,
-                                                 primary_key=params.get("primary_keys"))
+                                                 primary_key=primary_keys)
 
         with open(table.full_path, mode="wt", encoding="utf-8", newline="") as out_file:
             out_file.write(data.text)
