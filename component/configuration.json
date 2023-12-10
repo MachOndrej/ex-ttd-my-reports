@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "required": [
+    "username",
+    "#password"
+  ],
+  "properties": {
+    "username": {
+      "type": "string",
+      "title": "Username:",
+      "default": "",
+      "description": "",
+      "propertyOrder": 1
+    },
+    "#password": {
+      "type": "string",
+      "title": "Password:",
+      "default": "",
+      "description": "",
+      "propertyOrder": 2
+    }
+  }
+}

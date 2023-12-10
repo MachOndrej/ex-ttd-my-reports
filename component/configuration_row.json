@@ -1,0 +1,95 @@
+{
+  "title": "Row Configuration",
+  "type": "object",
+  "required": [
+    "report_schedule_id",
+    "advertiser_id",
+    "incremental_output",
+    "primary_keys"
+  ],
+  "properties": {
+    "advertiser_id": {
+      "title": "Advertiser ID",
+      "type": "array",
+      "format": "select",
+      "propertyOrder": 10,
+      "items": {
+        "enum": [],
+        "type": "string"
+      },
+      "options": {
+        "async": {
+          "label": "Load Advertiser IDs",
+          "action": "load_advertisers"
+        }
+      },
+      "uniqueItems": true,
+      "description": "Advertisers for which report data will be downloaded, leave empty to download data for all Advertisers."
+    },
+    "report_settings": {
+      "title": "Report Settings",
+      "type": "object",
+      "propertyOrder": 20,
+      "required": [
+        "report_schedule_id"
+      ],
+      "properties": {
+        "report_schedule_id": {
+          "type": "integer",
+          "title": "Report Schedule ID:",
+          "default": "",
+          "description": ""
+        }
+      }
+    },
+    "destination": {
+      "title": "Destination",
+      "type": "object",
+      "propertyOrder": 30,
+      "required": [
+        "incremental_output",
+        "primary_keys",
+        "storage_table_name"
+      ],
+      "properties": {
+        "primary_keys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Primary Keys",
+          "format": "select",
+          "options": {
+            "tags": true
+          },
+          "description": "",
+          "uniqueItems": true,
+          "propertyOrder": 30
+        },
+        "incremental_output": {
+          "enum": [
+            0,
+            1
+          ],
+          "type": "number",
+          "title": "Load type",
+          "default": 1,
+          "options": {
+            "enum_titles": [
+              "Full Load",
+              "Incremental Update"
+            ]
+          },
+          "description": "If set to Incremental update, the result tables will be updated based on the primary key. Full load overwrites the destination table each time. NOTE: If you wish to remove deleted records, this needs to be set to Full load and the Period from attribute empty.",
+          "propertyOrder": 20
+        },
+        "output_table_name": {
+          "type": "string",
+          "title": "Storage table name",
+          "description": "Name of the table stored in Storage",
+          "propertyOrder": 10
+        }
+      }
+    }
+  }
+}

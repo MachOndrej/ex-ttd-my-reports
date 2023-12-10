@@ -1,4 +1,3 @@
-import json
 import logging
 
 import requests
@@ -43,10 +42,10 @@ class TradeDesk:
         )
         self._logger.info("Authentication successful.")
 
-    def get_report_url(self, report_schedule_id: str, advertiser_id: str) -> str:
+    def get_report_url(self, report_schedule_id: str, advertiser_ids: list[str]) -> str:
         report_url = "/myreports/reportexecution/query/advertisers"
         payload = {
-            "AdvertiserIds": [advertiser_id],
+            "AdvertiserIds": advertiser_ids,
             "PageStartIndex": 0,
             "PageSize": 1,
             "ReportScheduleIds": [int(report_schedule_id)],
@@ -88,3 +87,59 @@ class TradeDesk:
             raise UserException(exc)
 
         return response
+
+    def get_partners(self) -> list[str]:
+        self._logger.debug("Retrieving partners")
+        payload = {
+            "PageStartIndex": 0,
+            "PageSize": 100
+        }
+        response = self.session.post(self.api_base_url+"/partner/query", json=payload)
+        try:
+            response.raise_for_status()
+        except HTTPError as exc:
+            self._logger.error(f"Partner retrieval failed: {exc}")
+            raise UserException(exc)
+        resp = response.json()
+        try:
+            resp_result = resp["Result"]
+        except KeyError as e:
+            self._logger.error(f"No partners found")
+            raise e
+        partners = [
+            resp["PartnerId"]
+            for resp in resp_result
+        ]
+
+        return partners
+
+    def get_advertisers(self, partner_ids: list[str]) -> list[dict[str, str]]:
+        self._logger.debug("Retrieving advertisers")
+        all_advertisers = []
+        for partner_id in partner_ids:
+            payload = {
+                "PageStartIndex": 0,
+                "PageSize": 100,
+                "PartnerId": partner_id
+            }
+            response = self.session.post(self.api_base_url+"/advertiser/query/partner", json=payload)
+            try:
+                response.raise_for_status()
+            except HTTPError as exc:
+                self._logger.error(f"Advertiser retrieval failed: {exc}")
+                raise UserException(exc)
+            resp = response.json()
+            try:
+                resp_result = resp["Result"]
+            except KeyError as e:
+                self._logger.error(f"No advertiser found for partner_id: {partner_id}")
+                raise e
+            advertisers = [
+                {"advertiser_name": resp["AdvertiserName"], "advertiser_id": resp["AdvertiserId"]}
+                for resp in resp_result
+            ]
+            all_advertisers.extend(advertisers)
+
+        return all_advertisers
+
+
