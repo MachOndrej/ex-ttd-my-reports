@@ -76,7 +76,7 @@ class Component(ComponentBase):
 
     def _get_partners(self) -> List[dict[str, str]]:
         params = self.configuration.parameters
-        if isinstance(params.get(PARAM_PARTNER_ID), ""), str):
+        if isinstance(params.get(PARAM_PARTNER_ID, ""), str):
             partner_ids = comma_separated_values_to_list(params.get("partner_id", ""))
         else:
             partner_ids = params.get(PARAM_PARTNER_ID, [])
@@ -84,7 +84,7 @@ class Component(ComponentBase):
             ttd_client = TradeDesk(username=params.get(PARAM_USERNAME), password=params.get(PARAM_PASSWORD))
             partner_ids = ttd_client.get_partners()
 
-            return partners
+            return partner_ids
         if not partner_ids:
             partner_ids = []
         return partner_ids
