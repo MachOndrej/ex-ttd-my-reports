@@ -45,7 +45,7 @@ class TradeDesk:
     def get_report_url(self, report_schedule_id: int, report_level: int, advertiser_ids: list[str],
                        partner_ids: list[str]) -> str:
         report_url = f"/myreports/reportexecution/query/{report_level}"
-        if report_schedule_id == "partners":
+        if report_level == "partners":
             entity = {
                 "PartnerIds": partner_ids
             }
