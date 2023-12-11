@@ -45,6 +45,7 @@ class TradeDesk:
     def get_report_url(self, report_schedule_id: int, report_level: int, advertiser_ids: list[str],
                        partner_ids: list[str]) -> str:
         report_url = f"/myreports/reportexecution/query/{report_level}"
+        print(advertiser_ids)
         if report_level == "partners":
             entity = {
                 "PartnerIds": partner_ids
@@ -67,7 +68,7 @@ class TradeDesk:
                 "Complete"
             ]
         }
-        payload = payload.update(entity)
+        payload.update(entity)
         self._logger.info(f"Retrieving scheduled report: {report_schedule_id}.")
         response = self.session.post(self.api_base_url + report_url, json=payload)
         try:

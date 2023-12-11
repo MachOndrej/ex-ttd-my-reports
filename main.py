@@ -48,7 +48,6 @@ class Component(ComponentBase):
             advertiser_ids = self._get_advertisers()
             report_entity = "advertisers"
 
-
         destination = params.get(PARAM_DESTINATION)
         table_name = destination.get(PARAM_DESTINATION_TABLE)
         is_incremental = bool(destination.get(PARAM_DESTINATION_INCREMENTAL))
