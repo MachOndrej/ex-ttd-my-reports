@@ -117,7 +117,7 @@ class TradeDesk:
             self._logger.error(f"No partners found")
             raise e
         partners = [
-            resp["PartnerID"] for resp in resp_result
+            resp["PartnerId"] for resp in resp_result
         ]
 
         return partners
