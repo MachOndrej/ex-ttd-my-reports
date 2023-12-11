@@ -42,14 +42,12 @@ class Component(ComponentBase):
         advertiser_ids = []
         if report_level == 0:
             report_entity = "partners"
-            partners = self._get_partners()
-            if partners:
-                partner_ids = [partner["partner_id"] for partner in partners]
+            partner_ids = self._get_partners()
+
         else:
-            advertisers = self._get_advertisers()
+            advertiser_ids = self._get_advertisers()
             report_entity = "advertisers"
-            if advertisers:
-                advertiser_ids = [advertiser["advertiser_id"] for advertiser in advertisers]
+
 
         destination = params.get(PARAM_DESTINATION)
         table_name = destination.get(PARAM_DESTINATION_TABLE)
@@ -74,7 +72,7 @@ class Component(ComponentBase):
 
         self.write_manifest(table)
 
-    def _get_partners(self) -> List[dict[str, str]]:
+    def _get_partners(self) -> List[str]:
         params = self.configuration.parameters
         if isinstance(params.get(PARAM_PARTNER_ID, ""), str):
             partner_ids = comma_separated_values_to_list(params.get("partner_id", ""))
@@ -89,7 +87,7 @@ class Component(ComponentBase):
             partner_ids = []
         return partner_ids
 
-    def _get_advertisers(self) -> List[dict[str, str]]:
+    def _get_advertisers(self) -> List[str]:
         params = self.configuration.parameters
         if isinstance(params.get(PARAM_ADVERTISER_ID, ""), str):
             advertiser_ids = comma_separated_values_to_list(params.get("advertiser_id", ""))
@@ -97,8 +95,7 @@ class Component(ComponentBase):
             advertiser_ids = params.get(PARAM_ADVERTISER_ID, [])
         if not advertiser_ids:
             ttd_client = TradeDesk(username=params.get(PARAM_USERNAME), password=params.get(PARAM_PASSWORD))
-            partners = ttd_client.get_partners()
-            partner_ids = [partner["partner_id"] for partner in partners.items()]
+            partner_ids = ttd_client.get_partners()
             advertiser_ids = ttd_client.get_advertisers(partner_ids)
 
             return advertiser_ids
@@ -109,7 +106,7 @@ class Component(ComponentBase):
     @sync_action("loadAdvertisers")
     def load_advertisers(self) -> List[SelectElement]:
         advertiser_ids = self._get_advertisers()
-        select_elements = [SelectElement(value=adv["advertiser_id"], label=adv["advertiser_name"]) for adv in
+        select_elements = [SelectElement(value=advertiser, label=advertiser) for advertiser in
                            advertiser_ids]
 
         return select_elements
@@ -117,7 +114,7 @@ class Component(ComponentBase):
     @sync_action("loadPartners")
     def load_partners(self) -> List[SelectElement]:
         partners_ids = self._get_partners()
-        select_elements = [SelectElement(value=partner["partner_id"], label=partner["partner_name"]) for partner in
+        select_elements = [SelectElement(value=partner, label=partner) for partner in
                            partners_ids]
 
         return select_elements

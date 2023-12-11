@@ -97,7 +97,7 @@ class TradeDesk:
 
         return response
 
-    def get_partners(self) -> list[dict[str, str]]:
+    def get_partners(self) -> list[str]:
         self._logger.debug("Retrieving partners")
         payload = {
             "PageStartIndex": 0,
@@ -116,13 +116,12 @@ class TradeDesk:
             self._logger.error(f"No partners found")
             raise e
         partners = [
-            {"partner_name": resp["PartnerName"], "partner_id": resp["PartnerID"]}
-            for resp in resp_result
+            resp["PartnerID"] for resp in resp_result
         ]
 
         return partners
 
-    def get_advertisers(self, partner_ids: list[str]) -> list[dict[str, str]]:
+    def get_advertisers(self, partner_ids: list[str]) -> list[str]:
         self._logger.debug("Retrieving advertisers")
         all_advertisers = []
         for partner_id in partner_ids:
@@ -144,8 +143,7 @@ class TradeDesk:
                 self._logger.error(f"No advertiser found for partner_id: {partner_id}")
                 raise e
             advertisers = [
-                {"advertiser_name": resp["AdvertiserName"], "advertiser_id": resp["AdvertiserId"]}
-                for resp in resp_result
+                resp["AdvertiserId"] for resp in resp_result
             ]
             all_advertisers.extend(advertisers)
 
