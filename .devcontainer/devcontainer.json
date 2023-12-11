@@ -1,0 +1,6 @@
+{
+  "image": "quay.io/keboola/docker-custom-python:latest",
+  "features": {
+  },
+  "postCreateCommand": "pip3 install --user -r requirements.txt"
+}
