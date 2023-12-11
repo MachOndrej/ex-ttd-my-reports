@@ -3,7 +3,7 @@
   "title": "Row Configuration",
   "required": [
     "report_settings",
-    "advertiser_id",
+    "report_level",
     "destination"
   ],
   "properties": {
@@ -57,6 +57,23 @@
       },
       "propertyOrder": 30
     },
+    "report_level": {
+      "type": "number",
+      "enum": [
+        0,
+        1
+      ],
+      "options": {
+        "enum_titles": [
+          "Partner",
+          "Advertiser"
+        ]
+      },
+      "title": "Report Level",
+      "default": false,
+      "description": "If set to Partner, choose partners for which you would like to download the report. If set to Advertiser choose advertisers for which you would like to download the report.",
+      "propertyOrder": 5
+    },
     "advertiser_id": {
       "type": "array",
       "items": {
@@ -71,9 +88,27 @@
           "action": "loadAdvertisers"
         }
       },
-      "description": "Advertisers for which report data will be downloaded, leave empty to download data for all Advertisers.",
+      "description": "Advertisers for which report data will be downloaded, leave empty if you wish to download data for Partners",
       "uniqueItems": true,
       "propertyOrder": 10
+    },
+    "partner_id": {
+      "type": "array",
+      "items": {
+        "enum": [],
+        "type": "string"
+      },
+      "title": "Partner ID",
+      "format": "select",
+      "options": {
+        "async": {
+          "label": "Load Partner IDs",
+          "action": "loadPartners"
+        }
+      },
+      "description": "Partners for which report data will be downloaded, leave empty if you wish to download data for Advertisers",
+      "uniqueItems": true,
+      "propertyOrder": 9
     },
     "report_settings": {
       "type": "object",

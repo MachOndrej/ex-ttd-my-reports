@@ -12,6 +12,8 @@ PARAM_USERNAME = "username"
 PARAM_PASSWORD = "#password"
 
 PARAM_ADVERTISER_ID = "advertiser_id"
+PARAM_PARTNER_ID = "partner_id"
+PARAM_REPORT_LEVEL = "report_level"
 
 PARAM_DESTINATION = "destination"
 PARAM_DESTINATION_TABLE = "output_table_name"
@@ -35,7 +37,19 @@ class Component(ComponentBase):
         self._logger.debug(f"Running component with following params: {params}")
 
         ttd_client = TradeDesk(username=params.get(PARAM_USERNAME), password=params.get(PARAM_PASSWORD))
-        advertiser_ids = self._get_advertisers()
+        report_level = params.get(PARAM_REPORT_LEVEL)
+        partner_ids = []
+        advertiser_ids = []
+        if report_level == 0:
+            report_entity = "partners"
+            partners = self._get_partners()
+            if partners:
+                partner_ids = [partner["partner_id"] for partner in partners]
+        else:
+            advertisers = self._get_advertisers()
+            report_entity = "advertisers"
+            if advertisers:
+                advertiser_ids = [advertiser["advertiser_id"] for advertiser in advertisers]
 
         destination = params.get(PARAM_DESTINATION)
         table_name = destination.get(PARAM_DESTINATION_TABLE)
@@ -46,7 +60,9 @@ class Component(ComponentBase):
         report_schedule_id = report_settings.get(PARAM_REPORT_SETTINGS_SCHEDULE_ID)
 
         report_url = ttd_client.get_report_url(report_schedule_id=report_schedule_id,
-                                               advertiser_ids=advertiser_ids)
+                                               report_level=report_entity,
+                                               advertiser_ids=advertiser_ids,
+                                               partner_ids=partner_ids)
         data = ttd_client.get_data(report_url)
         self._logger.info("Processing report.")
 
@@ -58,6 +74,21 @@ class Component(ComponentBase):
 
         self.write_manifest(table)
 
+    def _get_partners(self) -> List[dict[str, str]]:
+        params = self.configuration.parameters
+        if isinstance(params.get(PARAM_PARTNER_ID), ""), str):
+            partner_ids = comma_separated_values_to_list(params.get("partner_id", ""))
+        else:
+            partner_ids = params.get(PARAM_PARTNER_ID, [])
+        if not partner_ids:
+            ttd_client = TradeDesk(username=params.get(PARAM_USERNAME), password=params.get(PARAM_PASSWORD))
+            partner_ids = ttd_client.get_partners()
+
+            return partners
+        if not partner_ids:
+            partner_ids = []
+        return partner_ids
+
     def _get_advertisers(self) -> List[dict[str, str]]:
         params = self.configuration.parameters
         if isinstance(params.get(PARAM_ADVERTISER_ID, ""), str):
@@ -67,7 +98,8 @@ class Component(ComponentBase):
         if not advertiser_ids:
             ttd_client = TradeDesk(username=params.get(PARAM_USERNAME), password=params.get(PARAM_PASSWORD))
             partners = ttd_client.get_partners()
-            advertiser_ids = ttd_client.get_advertisers(partners)
+            partner_ids = [partner["partner_id"] for partner in partners.items()]
+            advertiser_ids = ttd_client.get_advertisers(partner_ids)
 
             return advertiser_ids
         if not advertiser_ids:
@@ -79,6 +111,14 @@ class Component(ComponentBase):
         advertiser_ids = self._get_advertisers()
         select_elements = [SelectElement(value=adv["advertiser_id"], label=adv["advertiser_name"]) for adv in
                            advertiser_ids]
+
+        return select_elements
+
+    @sync_action("loadPartners")
+    def load_partners(self) -> List[SelectElement]:
+        partners_ids = self._get_partners()
+        select_elements = [SelectElement(value=partner["partner_id"], label=partner["partner_name"]) for partner in
+                           partners_ids]
 
         return select_elements
 

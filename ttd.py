@@ -22,7 +22,7 @@ class TradeDesk:
             "Login": self.username,
             "Password": self.password
         }
-        response = self.session.post(self.api_base_url+auth_endpoint, json=payload)
+        response = self.session.post(self.api_base_url + auth_endpoint, json=payload)
         try:
             response.raise_for_status()
         except HTTPError as exc:
@@ -42,10 +42,18 @@ class TradeDesk:
         )
         self._logger.info("Authentication successful.")
 
-    def get_report_url(self, report_schedule_id: int, advertiser_ids: list[str]) -> str:
-        report_url = "/myreports/reportexecution/query/advertisers"
+    def get_report_url(self, report_schedule_id: int, report_level: int, advertiser_ids: list[str],
+                       partner_ids: list[str]) -> str:
+        report_url = f"/myreports/reportexecution/query/{report_level}"
+        if report_schedule_id == "partners":
+            entity = {
+                "PartnerIds": partner_ids
+            }
+        else:
+            entity = {
+                "AdvertiserIds": advertiser_ids
+            }
         payload = {
-            "AdvertiserIds": advertiser_ids,
             "PageStartIndex": 0,
             "PageSize": 1,
             "ReportScheduleIds": [report_schedule_id],
@@ -59,8 +67,9 @@ class TradeDesk:
                 "Complete"
             ]
         }
+        payload = payload.update(entity)
         self._logger.info(f"Retrieving scheduled report: {report_schedule_id}.")
-        response = self.session.post(self.api_base_url+report_url, json=payload)
+        response = self.session.post(self.api_base_url + report_url, json=payload)
         try:
             response.raise_for_status()
         except HTTPError as exc:
@@ -88,13 +97,13 @@ class TradeDesk:
 
         return response
 
-    def get_partners(self) -> list[str]:
+    def get_partners(self) -> list[dict[str, str]]:
         self._logger.debug("Retrieving partners")
         payload = {
             "PageStartIndex": 0,
             "PageSize": 100
         }
-        response = self.session.post(self.api_base_url+"/partner/query", json=payload)
+        response = self.session.post(self.api_base_url + "/partner/query", json=payload)
         try:
             response.raise_for_status()
         except HTTPError as exc:
@@ -107,7 +116,7 @@ class TradeDesk:
             self._logger.error(f"No partners found")
             raise e
         partners = [
-            resp["PartnerId"]
+            {"partner_name": resp["PartnerName"], "partner_id": resp["PartnerID"]}
             for resp in resp_result
         ]
 
@@ -122,7 +131,7 @@ class TradeDesk:
                 "PageSize": 100,
                 "PartnerId": partner_id
             }
-            response = self.session.post(self.api_base_url+"/advertiser/query/partner", json=payload)
+            response = self.session.post(self.api_base_url + "/advertiser/query/partner", json=payload)
             try:
                 response.raise_for_status()
             except HTTPError as exc:
@@ -141,5 +150,3 @@ class TradeDesk:
             all_advertisers.extend(advertisers)
 
         return all_advertisers
-
-
