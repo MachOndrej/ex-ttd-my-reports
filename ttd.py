@@ -71,11 +71,21 @@ class TradeDesk:
         payload.update(entity)
         self._logger.info(f"Retrieving scheduled report: {report_schedule_id}.")
         response = self.session.post(self.api_base_url + report_url, json=payload)
-        try:
-            response.raise_for_status()
-        except HTTPError as exc:
-            self._logger.error(f"Retrieval failed: {exc}")
-            raise UserException(exc)
+        retries = 5
+        for retry in range(retries):
+            try:
+                response.raise_for_status()
+            except HTTPError as exc:
+                self._logger.error(f"Retrieval failed run {retry}: {exc}")
+                if retry == retries - 1:
+                    raise UserException(exc)
+                continue
+            break
+        # try:
+        #     response.raise_for_status()
+        # except HTTPError as exc:
+        #     self._logger.error(f"Retrieval failed: {exc}")
+        #     raise UserException(exc)
         response = response.json()
 
         try:
